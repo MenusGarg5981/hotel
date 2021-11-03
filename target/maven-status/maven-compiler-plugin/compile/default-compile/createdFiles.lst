@@ -1,0 +1,5 @@
+com/fab/hotel/CustomerService.class
+com/fab/hotel/Customer.class
+com/fab/hotel/CustomerController.class
+com/fab/hotel/HotelApplication.class
+com/fab/hotel/CustomerRepository.class
