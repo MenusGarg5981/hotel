@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hotel
+  name: hotel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hotel
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hotel
+    spec:
+      containers:
+      - image: hotel/skywalking
+        name: skywalking
+        imagePullPolicy: Never
+        resources: {}
+status: {}
