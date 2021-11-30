@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: "2021-11-10T07:05:05Z"
+  generation: 1
+  labels:
+    app: hotel
+  name: hotel
+  namespace: hotel
+  resourceVersion: "185489"
+  uid: 98b50c31-7ca5-4963-ac77-d144160d5515
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: hotel
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hotel
+    spec:
+      volumes:
+        - name: skywalking-agent
+          emptyDir: { }
+      initContainers:
+        - name: agent-container
+          image: ghcr.io/apache/skywalking-java/skywalking-java@sha256:6707e00613a9a2db91855e91760b7b153d5696543a66fdda7f2994f5478705c3
+          volumeMounts:
+            - name: skywalking-agent
+              mountPath: /agent
+          command: [ "/bin/sh" ]
+          args: [ "-c", "cp -R /skywalking/agent /agent/" ]
+      containers:
+        - env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/skywalking/agent/skywalking-agent.jar"
+            - name: SW_AGENT_NAME
+              value: "hotel"
+            - name: SW_AGENT_COLLECTOR_BACKEND_SERVICES
+              value: "skywalking-oap.skywalking.svc.cluster.local:11800"
+          image: hotel/skywalking
+          imagePullPolicy: Never
+          name: hotel
+          volumeMounts:
+              - name: skywalking-agent
+                mountPath: /skywalking
+          ports:
+              - containerPort: 8081
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
